@@ -30,7 +30,7 @@ def get_tweets(search_for):
     for tweet in tweets:
         tweets_copy.append(tweet)
         
-    print("Total Tweets fetched:", len(tweets_copy))
+    print("Searching for tweets of:", search_for)
 
     tweets_df = pd.DataFrame()
 
@@ -59,10 +59,16 @@ def get_tweets(search_for):
     tweets_df = tweets_df.drop(columns=tweets_df.columns.difference(['user_name', 'user_location', 'date', 'text', 'rating']))
 
     tweets_df = tweets_df.reset_index(drop=True)
+    if ' ' in search_for:
+        search_for = search_for.replace(" ", "")
     if not os.path.exists(unidecode(search_for).strip() + '_tweets.csv'):
-        os.makedirs(unidecode(search_for).strip() + '_tweets.csv')
+        with open(unidecode(search_for).strip() + '_tweets.csv', "w") as my_empty_csv:
+            my_empty_csv.close()
     tweets_df = pd.concat([tweets_df, pd.read_csv(unidecode(search_for).strip() + '_tweets.csv', index_col=0, header=0)], axis=0, ignore_index=True)
+    len1 = len(tweets_df)
     tweets_df.drop_duplicates(subset=['user_name','text'], ignore_index=True, inplace=True)
+    len2 = len(tweets_df)
+    print(f'    New tweets fetched: {len1 - len2}       -       Total: {len2}')
     tweets_df.to_csv(unidecode(search_for).strip() + '_tweets.csv')
 
 for item in search_for.split(','):
