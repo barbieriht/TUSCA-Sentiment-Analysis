@@ -60,12 +60,14 @@ def get_tweets(search_for):
     tweets_df = tweets_df.reset_index(drop=True)
     if ' ' in search_for:
         search_for = search_for.replace(" ", "")
-    to_read = pd.read_csv(unidecode(search_for).strip() + '_tweets.csv', index_col=0, header=0)
-    len1 = len(to_read)
-    tweets_df = pd.concat([tweets_df, to_read], axis=0, ignore_index=True)
-    tweets_df.drop_duplicates(subset=['user_name','text'], ignore_index=True, inplace=True)
-    len2 = len(tweets_df)
-    print(f'    New tweets fetched: {len2 - len1}       -       Total: {len2}')
+        
+    if(os.path.isfile(unidecode(search_for).strip() + '_tweets.csv')):
+        to_read = pd.read_csv(unidecode(search_for).strip() + '_tweets.csv', index_col=0, header=0)
+        len1 = len(to_read)
+        tweets_df = pd.concat([tweets_df, to_read], axis=0, ignore_index=True)
+        tweets_df.drop_duplicates(subset=['user_name','text'], ignore_index=True, inplace=True)
+        len2 = len(tweets_df)
+        print(f'    New tweets fetched: {len2 - len1}       -       Total: {len2}')
     tweets_df.to_csv(unidecode(search_for).strip() + '_tweets.csv')
 
 for item in search_for.split(','):
